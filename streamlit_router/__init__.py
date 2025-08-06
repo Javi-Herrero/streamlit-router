@@ -76,6 +76,12 @@ class StreamlitRouter:
         return _
 
     def handle(self, path: str, method: str = None):
+        # Track history
+        if "navigation_history" not in st.session_state:
+            st.session_state["navigation_history"] = []
+
+        st.session_state["navigation_history"].append((path, method))
+
         endpoint, kwargs = self.urls.match(
             path, method
         )  # pylint: disable=unpacking-non-sequence
@@ -85,6 +91,7 @@ class StreamlitRouter:
         if self.inject_name in argspec:
             kwargs[self.inject_name] = self
         return func(**kwargs)
+
 
     def redirect(self, path: str, method: str = None):
         self.reset_request_state()
